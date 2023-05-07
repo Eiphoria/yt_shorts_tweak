@@ -1,22 +1,20 @@
 {
-	"manifest_version": 3,
-	"name": "ShortsVolCtrl",
-	"version": "1.0",
-	"description": "Wake up biden, we need volume control in shorts",
-	"icons": {"256": "icons/icon256.png"},
-	"author": "@polymorphous",
-    "background": {
-    "service_worker": 
-      "background.js"
-    },
-	"permissions": [
-	  "tabs",
-	  "activeTab",
-	  "scripting",
-	  "storage"
-	],
-	"host_permissions": [
-  "*://*/*"
-]
-
+  "manifest_version": 3,
+  "name": "ShortsVolCtrl",
+  "version": "1.0",
+  "description": "Wake up biden, we need volume control in shorts",
+  "icons": { "256": "icons/icon256.png" },
+  "author": "@polymorphous",
+  "background": {
+    "matches": ["https://*.youtube.com/shorts/*"],
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*.youtube.com/shorts/*"],
+      "js": ["shorts.js"]
+    }
+  ],
+  "permissions": ["tabs", "activeTab", "scripting", "storage"],
+  "host_permissions": ["https://*.youtube.com/shorts/*"]
 }

@@ -12,67 +12,50 @@
 //     }
 //   });
 
-let all_query_true = true;
-let id_renderer = 0;
+let isInjected = false;
+let volume = 0.5; // move to the some kind of storage
+let slider = document.createElement("input");
+slider.style.zIndex = "1000000";
+slider.style.alignSelf = "flex-start";
+slider.style.justifySelf = "flex-start";
+slider.style.position = "absolute";
+slider.style.top = "72px";
+slider.style.opacity = "80";
+slider.setAttribute("type", "range");
+slider.setAttribute("min", "0");
+slider.setAttribute("max", "100");
+slider.addEventListener("mouseenter", () => (slider.style.opacity = "100"));
 
-let video_renderers = document.querySelectorAll("ytd-reel-video-renderer");
-let render_element = null;
-
-video_renderers.forEach((element) => {
-  let is_active_render = element.getAttribute("is-active");
-  if (typeof is_active_render === typeof "string") {
-    console.log(is_active_render);
-    console.log(element);
-    id_renderer = parseInt(element.getAttribute("id"));
-    render_element = element;
-    return;
-  }
-});
-
-console.log(id_renderer);
-let video_renderer = video_renderers[id_renderer];
-let video_rendererss = document.querySelector("ytd-reel-video-renderer");
-let player = video_rendererss.querySelector(".html5-video-player");
-let video = player.querySelector(".video-stream.html5-main-video");
-
-if (!video) {
-  console.log("Fail to query select <html5-main-video> class");
-  all_query_true = false;
-} else if (!player) {
-  console.log("Fail to query select <html5-video-player> class");
-  all_query_true = false;
-} else if (!video_rendererss) {
-  console.log("Fail to query select <reel-video-in-sequence> class");
-  all_query_true = false;
-} else if (all_query_true) {
-  console.log("SucceFULL query select");
-  var slider = document.createElement("input");
-  slider.style.zIndex = "1000000";
-  slider.style.alignSelf = "flex-start";
-  slider.style.justifySelf = "flex-start";
-  slider.style.position = "absolute";
-  slider.style.top = "72px";
-  slider.style.opacity = "80";
-  slider.setAttribute("type", "range");
-  slider.setAttribute("min", "0");
-  slider.setAttribute("max", "100");
-  if (slider) {
-    console.log("Slider created");
-  } else {
-    console.log("Slider create failed");
-  }
-
-  player.appendChild(slider);
-  slider.addEventListener("input", (e) => {
-    video.volume = +e.target.value / 100;
-    // possible implementetion of memory volume level
-    // chrome.storage.local.set({ 'volume': video.volume }).then(() => {
-    //     console.log("Default volume updated to " + video.volume);
-    //       });
+function waitForVideo() {
+  return new Promise(function (resolve) {
+    const intervalID = setInterval(function () {
+      const element = document.querySelector("video");
+      if (element) {
+        element.volume = volume;
+        clearInterval(intervalID);
+        resolve(element);
+      }
+    }, 1);
   });
-  video.addEventListener("mouseenter", () => (slider.style.opacity = "100"));
-  video.addEventListener("mouseleave", () => (slider.style.opacity = "0"));
-  slider.addEventListener("mouseenter", () => (slider.style.opacity = "100"));
-} else {
-  console.log("Eto polniy hai iomy hretz`");
 }
+
+function injectSlider() {
+  waitForVideo().then(function (v) {
+    if (!isInjected) {
+      document.querySelector(".html5-video-player").appendChild(slider);
+      isInjected = true;
+    }
+
+    slider.addEventListener("input", (e) => {
+      volume = +e.target.value / 100;
+      v.volume = volume;
+    });
+    v.addEventListener("mouseenter", () => (slider.style.opacity = "100"));
+    v.addEventListener("mouseleave", () => (slider.style.opacity = "0"));
+  });
+}
+
+injectSlider();
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  injectSlider();
+});
