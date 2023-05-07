@@ -5,8 +5,10 @@ let vol_ctrl = video_renderer.querySelector(".video-stream.html5-main-video");
 // console.log(video, player, video_renderer);
 console.log((video && player && video_renderer) === true);
 if (video && player && video_renderer) {
-    console.log("Succefull query select");
-}else{console.log("Failed query select")}
+  console.log("Succefull query select");
+} else {
+  console.log("Failed query select");
+}
 
 let slider = document.createElement("input");
 slider.style.zIndex = "1000000";
@@ -19,9 +21,11 @@ slider.setAttribute("type", "range");
 slider.setAttribute("orient", "vertical");
 slider.setAttribute("min", "0");
 slider.setAttribute("max", "100");
-if(slider){
-    console.log("Slider created");
-}else{console.log("Slider create failed")}
+if (slider) {
+  console.log("Slider created");
+} else {
+  console.log("Slider create failed");
+}
 
 player.appendChild(slider);
 slider.addEventListener("input", (e) => (video.volume = +e.target.value / 100));
